@@ -7,6 +7,7 @@
 
 import Foundation
 import CoreData
+import UIKit
 
 class Model {
     
@@ -17,19 +18,71 @@ class Model {
         return coreDataService.films
     }
     
-    var arrayHelper: [NSManagedObject]?
+    var sortAscending: Bool = false
     
-    func fetchDataFromApi() {
+    var arrayHelper: [NSManagedObject]?
+    var arrayFavoritesFilms: [NSManagedObject]?
+    
+    func fetchDataFromApi(page: Int, requestOption: RequestOptions, completition: @escaping (Bool) -> ()) {
         
-        urlService.dataRequest(page: 1, requestOptions: .allMovie) { error, movieList in
+        urlService.dataRequest(page: page, requestOptions: requestOption) { error, movieList in
             
             guard let movieList = movieList else {return}
             
             print("++ json data count \(String(describing: movieList.results?.count))")
             
-            self.coreDataService.saveData(objects: movieList, kind: .allFilms)
-            
+            if error == nil {
+                self.coreDataService.saveData(objects: movieList, requestOtions: requestOption)
+                completition(true)
+            } else {
+                print("coreDataService.saveData error \(String(describing: error))")
+                completition(false)
+            }
+                
         }
         
+    }
+    
+    func sortFilms() {
+        coreDataService.sortFilms(sort: sortAscending) { films in
+            self.arrayHelper = films
+        }
+    }
+    
+    func searchFilm(query: String) {
+        arrayHelper = coreDataService.searchFilm(query)
+    }
+    
+    func chooseFilm(id: Int) {
+        coreDataService.likedFilms(id: id)
+    }
+    
+    func checkLike(id: Int) -> Bool {
+        return coreDataService.checkLikedFilm(id: id)
+    }
+    
+    func favoritesFilms() {
+        arrayFavoritesFilms = coreDataService.separateFavorites()
+    }
+    
+    func deleteLikedArrayByIndex(index: Int) {
+        arrayFavoritesFilms?.remove(at: index)
+    }
+    
+    func getPoster(_ partOfUrl: String, completiton: @escaping (UIImage) -> Void) {
+        urlService.getSetPoster(withUrl: partOfUrl) { image in
+            completiton(image)
+        }
+    }
+    
+    func getScreenshots(id: Int, completition: @escaping () -> Void) {
+        urlService.getScreenshots(id) { error, data in
+            guard let unwrdata = data,
+            error == nil else {return}
+            
+            self.coreDataService.saveScreenshotsLinks(allData: unwrdata, id: id) {
+                completition()
+            }
+        }
     }
 }

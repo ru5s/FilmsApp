@@ -10,7 +10,7 @@ import UIKit
 import CryptoKit
 
 //все возможные варинаты запроса в апи (в приложении используется только 3)
-enum RequestOptions: String {
+enum RequestOptions: String, CaseIterable {
     case allMovie = "popular"
     case nowPlaying = "now_playing"
     case topRated = "top_rated"
@@ -41,6 +41,7 @@ class URLService {
             guard let unwrData = data,
                   (response as? HTTPURLResponse)?.statusCode == 200,
                   error == nil else {
+                print("nil")
                 completition(error, nil)
                 return
             }

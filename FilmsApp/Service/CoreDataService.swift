@@ -191,7 +191,20 @@ class CoreDataService {
         return false
     }
     
-    func sortFilms(sort: Bool = false, completition: @escaping ([NSManagedObject]?) -> ()){
+    func sortFilms(sort: Bool = false, type: RequestOptions, completition: @escaping ([NSManagedObject]?) -> ()){
+        
+        var typeFilms: String
+        
+        switch type {
+        case .allMovie:
+            typeFilms = "popularType"
+        case .nowPlaying:
+            typeFilms = "nowPlayingType"
+        case .topRated:
+            typeFilms = "topRatedType"
+        case .upcoming:
+            typeFilms = "upcomingType"
+        }
         
         let arrayHelper: [NSManagedObject]
         
@@ -200,6 +213,8 @@ class CoreDataService {
         let managedContext = appDelegate.persistentContainer.viewContext
         
         let fetchRequest: NSFetchRequest<Films> = Films.fetchRequest()
+        
+        fetchRequest.predicate = NSPredicate(format: "\(typeFilms) == %@", NSNumber(value: true))
         
         let sortDescriptor = NSSortDescriptor(key: "filmRating", ascending: sort)
         
@@ -304,5 +319,81 @@ class CoreDataService {
         }
         
         
+    }
+    
+    func separateByType(type: RequestOptions) -> [NSManagedObject]? {
+        
+        var typeFilms: String
+        
+        switch type {
+        case .allMovie:
+            typeFilms = "popularType"
+        case .nowPlaying:
+            typeFilms = "nowPlayingType"
+        case .topRated:
+            typeFilms = "topRatedType"
+        case .upcoming:
+            typeFilms = "upcomingType"
+        }
+        
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {return []}
+        
+        let managedContext = appDelegate.persistentContainer.viewContext
+        
+        let fetchRequest: NSFetchRequest<Films> = Films.fetchRequest()
+        
+        fetchRequest.predicate = NSPredicate(format: "\(typeFilms) == %@", NSNumber(value: true))
+        
+        do {
+            
+            let searchResult = try managedContext.fetch(fetchRequest)
+
+            return searchResult
+            
+        } catch let error as NSError {
+            
+            print("Could not fetch \(error), \(error.userInfo)")
+            return nil
+        }
+    }
+    
+    func avialabilityObjectInDBbyType(type: RequestOptions, completition: @escaping (Bool) -> ()) {
+        var typeFilms: String
+        
+        switch type {
+        case .allMovie:
+            typeFilms = "popularType"
+        case .nowPlaying:
+            typeFilms = "nowPlayingType"
+        case .topRated:
+            typeFilms = "topRatedType"
+        case .upcoming:
+            typeFilms = "upcomingType"
+        }
+        
+        let arrayHelper: [NSManagedObject]
+        
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {return}
+        
+        let managedContext = appDelegate.persistentContainer.viewContext
+        
+        let fetchRequest: NSFetchRequest<Films> = Films.fetchRequest()
+        
+        fetchRequest.predicate = NSPredicate(format: "\(typeFilms) == %@", NSNumber(value: true))
+        
+        do {
+            
+            arrayHelper = try managedContext.fetch(fetchRequest)
+            
+            if arrayHelper.isEmpty {
+                completition(false)
+            } else {
+                completition(true)
+            }
+            
+        } catch let error as NSError {
+            print("sortFilms() error \(error)")
+            completition(false)
+        }
     }
 }

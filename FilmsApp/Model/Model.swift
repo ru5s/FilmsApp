@@ -23,28 +23,44 @@ class Model {
     var arrayHelper: [NSManagedObject]?
     var arrayFavoritesFilms: [NSManagedObject]?
     
+    func haveDataInDataBase(type: RequestOptions) -> Bool {
+        var boolState: Bool = false
+        
+        coreDataService.avialabilityObjectInDBbyType(type: type) { bool in
+            if bool == true {
+                boolState = true
+            } else {
+                boolState = false
+            }
+        }
+        return boolState
+    }
+    
     func fetchDataFromApi(page: Int, requestOption: RequestOptions, completition: @escaping (Bool) -> ()) {
         
         urlService.dataRequest(page: page, requestOptions: requestOption) { error, movieList in
             
-            guard let movieList = movieList else {return}
-            
-            print("++ json data count \(String(describing: movieList.results?.count))")
-            
-            if error == nil {
-                self.coreDataService.saveData(objects: movieList, requestOtions: requestOption)
-                completition(true)
-            } else {
+            if error != nil {
+                print("second nil")
                 print("coreDataService.saveData error \(String(describing: error))")
                 completition(false)
             }
+            
+            guard let movieList = movieList else {return}
+            
+            if error == nil {
+                print("second not nil")
+                self.coreDataService.saveData(objects: movieList, requestOtions: requestOption)
+                completition(true)
+            }
+            
                 
         }
         
     }
     
-    func sortFilms() {
-        coreDataService.sortFilms(sort: sortAscending) { films in
+    func sortFilms(_ typeRequest: RequestOptions) {
+        coreDataService.sortFilms(sort: sortAscending, type: typeRequest) { films in
             self.arrayHelper = films
         }
     }
@@ -84,5 +100,9 @@ class Model {
                 completition()
             }
         }
+    }
+    
+    func separateByTypeRequest(request: RequestOptions) {
+        arrayHelper = coreDataService.separateByType(type: request)
     }
 }

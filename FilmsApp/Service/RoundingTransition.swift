@@ -20,7 +20,7 @@ class RoundingTransition: NSObject {
         }
     }
     //цвет круга
-    var roundColor = UIColor.red
+    var roundColor = UIColor.black
     //время анимации
     var time = 0.6
     //енум для стадий отображения

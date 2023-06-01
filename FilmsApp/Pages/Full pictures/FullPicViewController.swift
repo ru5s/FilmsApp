@@ -20,7 +20,7 @@ class FullPicViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = .black
         view.addSubview(fullimage)
         navigationItem.title = "Full pictures view"
         

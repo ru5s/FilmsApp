@@ -44,8 +44,6 @@ class FavoriteFilmsViewController: UIViewController {
         model.arrayFavoritesFilms = model.allFilms
         model.favoritesFilms()
         
-        print("++ count \(String(describing: model.arrayFavoritesFilms?.count))")
-        
         navigationItem.title = "Favorite films"
 
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .pause, target: self, action: #selector(openDetailFilm))

@@ -23,7 +23,6 @@ class MainViewController: UIViewController {
         searchBar.layer.cornerRadius = 5
         
         searchBar.delegate = self
-//        navigationItem.titleView = searchBar
         /* end*/
 
         return searchBar
@@ -47,21 +46,46 @@ class MainViewController: UIViewController {
         return cv
     }()
     
+    var sortType: RequestOptions = .allMovie
+    var pagePopular: Int = UserDefaults.standard.integer(forKey: "Pop")
+    var pageTopRated: Int = 1
+    var pageWatching: Int = 1
+    var pageUpcoming: Int = 1
+    
+    let buttonStackView = UIStackView()
+    let getTypeRequestBtn = UIButton()
+    var openStackBool = false
+    var expandBtnTitle: String = "Popular"
+    
     let model = Model()
 
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
         
-        model.fetchDataFromApi(page: 2, requestOption: .upcoming) { bool in
+        checkDB()
+        
+        model.fetchDataFromApi(page: pagePopular, requestOption: .allMovie) { bool in
             DispatchQueue.main.async {
                 if bool == true {
                     self.collectionView.reloadData()
                     
                     self.model.arrayHelper = self.model.allFilms
                     
-                    self.model.sortFilms()
+                    self.model.separateByTypeRequest(request: .allMovie)
+                }else{
+                    
+                    let alert = UIAlertController()
+                    
+                    let alertAction = UIAlertAction(title: "Not connection", style: .cancel)
+                    
+                    alert.addAction(alertAction)
+                    self.present(alert, animated:  true)
+                    
+                    self.model.separateByTypeRequest(request: .allMovie)
+                    self.collectionView.reloadData()
                 }
+                
             }
         }
         
@@ -72,7 +96,13 @@ class MainViewController: UIViewController {
         collectionView.delegate = self
         collectionView.dataSource = self
         
-        navigationItem.title = "Films app"
+        setupButtonStackView()
+        setupExpandButton()
+        
+        buttonStackView.isHidden = true
+        view.addSubview(getTypeRequestBtn)
+        view.addSubview(buttonStackView)
+        navigationItem.title = "Popular"
         
         let favoriteBarButtonItem = UIBarButtonItem(title: "Liked", style: .plain, target: self, action: #selector(openLikeFilms))
         favoriteBarButtonItem.image = UIImage(systemName: "heart.fill")
@@ -82,6 +112,34 @@ class MainViewController: UIViewController {
         navigationItem.leftBarButtonItem = sortedButton
         
         collectionView.reloadData()
+    }
+    
+    private func checkDB() {
+        
+        for case let typeIterable in RequestOptions.allCases {
+            
+            switch typeIterable {
+                
+            case .allMovie:
+                if model.haveDataInDataBase(type: .allMovie) == false {
+                    UserDefaults.standard.set(1, forKey: "Popular")
+                }
+            case .nowPlaying:
+                if model.haveDataInDataBase(type: .nowPlaying) == false {
+                    UserDefaults.standard.set(1, forKey: "NowPlaying")
+                }
+            case .topRated:
+                if model.haveDataInDataBase(type: .topRated) == false {
+                    UserDefaults.standard.set(1, forKey: "TopRated")
+                }
+            case .upcoming:
+                if model.haveDataInDataBase(type: .upcoming) == false {
+                    UserDefaults.standard.set(1, forKey: "Upcoming")
+                }
+            }
+        }
+        
+        
     }
     
     override func viewDidLayoutSubviews() {
@@ -95,6 +153,13 @@ class MainViewController: UIViewController {
             collectionView.bottomAnchor.constraint(equalTo: safeArea.bottomAnchor),
             collectionView.leftAnchor.constraint(equalTo: safeArea.leftAnchor),
             collectionView.rightAnchor.constraint(equalTo: safeArea.rightAnchor),
+            getTypeRequestBtn.topAnchor.constraint(equalTo: safeArea.bottomAnchor, constant: -50),
+            getTypeRequestBtn.centerXAnchor.constraint(equalTo: collectionView.centerXAnchor),
+            getTypeRequestBtn.heightAnchor.constraint(equalToConstant: 35),
+            getTypeRequestBtn.widthAnchor.constraint(equalToConstant: view.bounds.width / 3),
+            buttonStackView.bottomAnchor.constraint(equalTo: getTypeRequestBtn.topAnchor, constant: -10),
+            buttonStackView.widthAnchor.constraint(equalToConstant: view.bounds.width / 3),
+            buttonStackView.centerXAnchor.constraint(equalTo: collectionView.centerXAnchor)
         ])
         
     }
@@ -108,7 +173,7 @@ class MainViewController: UIViewController {
         
         model.sortAscending ? (sender.image = UIImage(systemName: "arrow.down")) : (sender.image = UIImage(systemName: "arrow.up"))
         
-        model.sortFilms()
+        model.sortFilms(sortType)
         collectionView.reloadData()
     }
     
@@ -125,95 +190,4 @@ class MainViewController: UIViewController {
         
     }
 
-}
-
-extension MainViewController: UICollectionViewDelegate, UICollectionViewDataSource{
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        
-        return model.arrayHelper?.count ?? 0
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "CollectionCell", for: indexPath) as? FilmCollectionViewCell else {
-            return UICollectionViewCell()
-        }
-        
-        DispatchQueue.main.async {
-            
-            cell.data = self.model.arrayHelper?[indexPath.item]
-            self.model.checkLike(id: Int(self.model.arrayHelper?[indexPath.row].value(forKey: "id") as? Int32 ?? 0)) ? (cell.heartImage.tintColor = .red) : (cell.heartImage.tintColor = .gray)
-        }
-        
-        let tap = UITapGestureRecognizer()
-        tap.addTarget(self, action: #selector(tappedHeart(_ :)))
-        cell.heartImage.isUserInteractionEnabled = true
-        cell.heartImage.tag = Int(model.arrayHelper?[indexPath.row].value(forKey: "id") as? Int32 ?? 0)
-        cell.heartImage.addGestureRecognizer(tap)
-        
-        return cell
-    }
-    
-    @objc func tappedHeart(_ sender: UITapGestureRecognizer) {
-        
-        let id = sender.view?.tag
-        guard let id = id else {return}
-        
-        DispatchQueue.main.async {
-            
-            UIView.animate(withDuration: 0.2) {
-                sender.view?.tintColor == .red ? (sender.view?.tintColor = .gray) : (sender.view?.tintColor = .red)
-            }
-            
-            self.model.chooseFilm(id: id)
-
-        }
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        
-        let detailedVC = DetailFilmViewController()
-        
-        detailedVC.data = model.arrayHelper?[indexPath.item]
-        
-        self.navigationController?.modalTransitionStyle = .partialCurl
-
-        navigationController?.pushViewController(detailedVC, animated: true)
-        
-    }
-    
-}
-
-extension MainViewController: UISearchBarDelegate{
-    
-    //работа со строкой поиска
-    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        
-        //приравнивание вспомогательного массива к массиву всех фильмов что есть в базе
-        model.arrayHelper = model.allFilms
-        
-        //запус метода поиска по введенному тексту
-        model.searchFilm(query: searchText)
-        
-        //если поисковая строка пустая то производить обратное приравнивание и сортировку
-        if searchText.isEmpty {
-            model.arrayHelper = model.allFilms
-            model.sortFilms()
-        }
-        
-        DispatchQueue.main.async {
-            self.collectionView.reloadData()
-        }
-    }
-    
-    //метод нажатия кнопки отмены
-    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
-        model.arrayHelper = model.allFilms
-        
-        model.sortFilms()
-        
-        DispatchQueue.main.async {
-            self.collectionView.reloadData()
-        }
-    }
-    
 }

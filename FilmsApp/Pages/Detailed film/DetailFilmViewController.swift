@@ -42,7 +42,7 @@ class DetailFilmViewController: UIViewController, UIViewControllerTransitioningD
         label.text = "Название фильма"
         label.font = UIFont.systemFont(ofSize: 23, weight: .bold)
         label.textAlignment = .left
-        label.numberOfLines = 1
+        label.numberOfLines = 2
         label.textColor = .white
         
         return label
@@ -165,8 +165,9 @@ class DetailFilmViewController: UIViewController, UIViewControllerTransitioningD
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
         
-        navigationItem.title = "Detailed film"
+//        navigationItem.title = curentFilm?.filmTitle ?? ""
         
+//        navigationController?.navigationBar.prefersLargeTitles = true
         navigationController?.navigationBar.isTranslucent = true
         let barItem = UIBarButtonItem(title: "add to Like", style: .plain, target: self, action: #selector(openFilmPics))
         
@@ -223,14 +224,15 @@ class DetailFilmViewController: UIViewController, UIViewControllerTransitioningD
             posterPreviewImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             blackRectangle.widthAnchor.constraint(equalToConstant: view.bounds.width),
             blackRectangle.bottomAnchor.constraint(equalTo: posterPreviewImageView.bottomAnchor),
-            blackRectangle.heightAnchor.constraint(equalToConstant: 80),
+            blackRectangle.topAnchor.constraint(equalTo: filmTitleLabel.topAnchor, constant: -10),
             topBlockWithGradient.topAnchor.constraint(equalTo: view.topAnchor),
             topBlockWithGradient.widthAnchor.constraint(equalToConstant: view.bounds.width),
             topBlockWithGradient.bottomAnchor.constraint(equalTo: safeZone.topAnchor),
-            filmTitleLabel.topAnchor.constraint(equalTo: blackRectangle.topAnchor, constant: 10),
+            filmTitleLabel.bottomAnchor.constraint(equalTo: releaseYearLabel.topAnchor, constant: -10),
             filmTitleLabel.leadingAnchor.constraint(equalTo: safeZone.leadingAnchor),
+            filmTitleLabel.trailingAnchor.constraint(equalTo: safeZone.trailingAnchor),
             releaseYearLabel.leadingAnchor.constraint(equalTo: safeZone.leadingAnchor),
-            releaseYearLabel.bottomAnchor.constraint(equalTo: blackRectangle.bottomAnchor, constant: -10),
+            releaseYearLabel.bottomAnchor.constraint(equalTo: posterPreviewImageView.bottomAnchor, constant: -10),
             ratingLabel.trailingAnchor.constraint(equalTo: safeZone.trailingAnchor),
             ratingLabel.bottomAnchor.constraint(equalTo: blackRectangle.bottomAnchor, constant: -10),
             scrollView.topAnchor.constraint(equalTo: posterPreviewImageView.bottomAnchor),

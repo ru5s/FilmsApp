@@ -15,15 +15,14 @@ class MainViewController: UIViewController {
         let searchBar = UISearchBar(frame: CGRect(x: 0, y: 20, width: UIScreen.main.bounds.width - 20, height: 50))
         searchBar.translatesAutoresizingMaskIntoConstraints = false
         searchBar.searchBarStyle = UISearchBar.Style.minimal
-        searchBar.backgroundColor = .white.withAlphaComponent(0.8)
-        searchBar.placeholder = " Search..."
+        searchBar.backgroundColor = .systemBackground
+        searchBar.placeholder = " Search film..."
         searchBar.sizeToFit()
         searchBar.isTranslucent = true
         searchBar.backgroundImage = UIImage()
         searchBar.layer.cornerRadius = 5
-
+        
         searchBar.delegate = self
-//        navigationItem.titleView = searchBar
         /* end*/
 
         return searchBar
@@ -47,17 +46,48 @@ class MainViewController: UIViewController {
         return cv
     }()
     
-    let urlService = URLService()
-    let coreDataService = CoreDataService()
-    let imageAdress = "https://image.tmdb.org/t/p/w500/"
+    var sortType: RequestOptions = .allMovie
+    var pagePopular: Int = UserDefaults.standard.integer(forKey: "Pop")
+    var pageTopRated: Int = 1
+    var pageWatching: Int = 1
+    var pageUpcoming: Int = 1
+    
+    let buttonStackView = UIStackView()
+    let getTypeRequestBtn = UIButton()
+    var openStackBool = false
+    var expandBtnTitle: String = "Popular"
     
     let model = Model()
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .white
+        view.backgroundColor = .systemBackground
         
+        checkDB()
         
+        model.fetchDataFromApi(page: pagePopular, requestOption: .allMovie) { bool in
+            DispatchQueue.main.async {
+                if bool == true {
+                    self.collectionView.reloadData()
+                    
+                    self.model.arrayHelper = self.model.allFilms
+                    
+                    self.model.separateByTypeRequest(request: .allMovie)
+                }else{
+                    
+                    let alert = UIAlertController()
+                    
+                    let alertAction = UIAlertAction(title: "Not connection", style: .cancel)
+                    
+                    alert.addAction(alertAction)
+                    self.present(alert, animated:  true)
+                    
+                    self.model.separateByTypeRequest(request: .allMovie)
+                    self.collectionView.reloadData()
+                }
+                
+            }
+        }
         
         view.addSubview(mainSearchBar)
         mainSearchBar.delegate = self
@@ -66,14 +96,48 @@ class MainViewController: UIViewController {
         collectionView.delegate = self
         collectionView.dataSource = self
         
-        navigationItem.title = "Films app"
+        setupButtonStackView()
+        setupExpandButton()
         
-        let favoriteBarButtonItem = UIBarButtonItem(title: "Like", style: .plain, target: self, action: #selector(openSaveFilms))
-        let detailBarButtonItem = UIBarButtonItem(title: "All", style: .plain, target: self, action: #selector(openDetailFilm))
-
-        navigationItem.rightBarButtonItems = [favoriteBarButtonItem, detailBarButtonItem]
+        buttonStackView.isHidden = true
+        view.addSubview(getTypeRequestBtn)
+        view.addSubview(buttonStackView)
+        navigationItem.title = "Popular"
         
+        let favoriteBarButtonItem = UIBarButtonItem(title: "Liked", style: .plain, target: self, action: #selector(openLikeFilms))
+        favoriteBarButtonItem.image = UIImage(systemName: "heart.fill")
+        let sortedButton = UIBarButtonItem(image: UIImage(systemName: "arrow.up"), style: .plain, target: self, action: #selector(sortedFilms(sender:)))
         
+        navigationItem.rightBarButtonItems = [favoriteBarButtonItem]
+        navigationItem.leftBarButtonItem = sortedButton
+        
+        collectionView.reloadData()
+    }
+    
+    private func checkDB() {
+        
+        for case let typeIterable in RequestOptions.allCases {
+            
+            switch typeIterable {
+                
+            case .allMovie:
+                if model.haveDataInDataBase(type: .allMovie) == false {
+                    UserDefaults.standard.set(1, forKey: "Popular")
+                }
+            case .nowPlaying:
+                if model.haveDataInDataBase(type: .nowPlaying) == false {
+                    UserDefaults.standard.set(1, forKey: "NowPlaying")
+                }
+            case .topRated:
+                if model.haveDataInDataBase(type: .topRated) == false {
+                    UserDefaults.standard.set(1, forKey: "TopRated")
+                }
+            case .upcoming:
+                if model.haveDataInDataBase(type: .upcoming) == false {
+                    UserDefaults.standard.set(1, forKey: "Upcoming")
+                }
+            }
+        }
         
         
     }
@@ -89,9 +153,28 @@ class MainViewController: UIViewController {
             collectionView.bottomAnchor.constraint(equalTo: safeArea.bottomAnchor),
             collectionView.leftAnchor.constraint(equalTo: safeArea.leftAnchor),
             collectionView.rightAnchor.constraint(equalTo: safeArea.rightAnchor),
+            getTypeRequestBtn.topAnchor.constraint(equalTo: safeArea.bottomAnchor, constant: -50),
+            getTypeRequestBtn.centerXAnchor.constraint(equalTo: collectionView.centerXAnchor),
+            getTypeRequestBtn.heightAnchor.constraint(equalToConstant: 35),
+            getTypeRequestBtn.widthAnchor.constraint(equalToConstant: view.bounds.width / 3),
+            buttonStackView.bottomAnchor.constraint(equalTo: getTypeRequestBtn.topAnchor, constant: -10),
+            buttonStackView.widthAnchor.constraint(equalToConstant: view.bounds.width / 3),
+            buttonStackView.centerXAnchor.constraint(equalTo: collectionView.centerXAnchor)
         ])
         
-//        view.constraints
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        collectionView.reloadData()
+    }
+    
+    @objc private func sortedFilms(sender: UIBarButtonItem) {
+        model.sortAscending.toggle()
+        
+        model.sortAscending ? (sender.image = UIImage(systemName: "arrow.down")) : (sender.image = UIImage(systemName: "arrow.up"))
+        
+        model.sortFilms(sortType)
+        collectionView.reloadData()
     }
     
     @objc private func openDetailFilm(){
@@ -100,59 +183,11 @@ class MainViewController: UIViewController {
         navigationController?.pushViewController(detailFilmVC, animated: true)
     }
     
-    @objc private func openSaveFilms(){
+    @objc private func openLikeFilms(){
         let favoriteFilms = FavoriteFilmsViewController()
         
         navigationController?.pushViewController(favoriteFilms, animated: true)
-    }
-
-}
-
-extension MainViewController: UICollectionViewDelegate, UICollectionViewDataSource{
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-
-        return model.allFilms.count
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "CollectionCell", for: indexPath) as? FilmCollectionViewCell else {
-            return UICollectionViewCell()
-        }
-        
-//        cell.posterPreviewImageView.image = UIImage(named: testArray[indexPath.row].testPic!)
-//        cell.filmTitleLabel.text = testArray[indexPath.row].testTitle
-//        cell.releaseYearLabel.text = testArray[indexPath.row].testYear
-//        cell.ratingLabel.text = testArray[indexPath.row].testRating
-        
-        cell.filmTitleLabel.text = model.allFilms[indexPath.row].value(forKeyPath: "filmTitle") as? String
-        cell.releaseYearLabel.text = String(model.allFilms[indexPath.row].value(forKeyPath: "filmYear") as? Int ?? 0000)
-        cell.ratingLabel.text = String(model.allFilms[indexPath.row].value(forKeyPath: "filmRating") as? Double ?? 0.0)
-        
-        guard let url = URL(string: imageAdress + "\(model.allFilms[indexPath.row].value(forKeyPath: "filmPic") as! String)") else {return cell}
-        
-        urlService.getSetPoster(withUrl: url) { image in
-            cell.posterPreviewImageView.image = image
-        }
-        
-        return cell
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let detailedVC = DetailFilmViewController()
-        
-        detailedVC.posterPreviewImageView.image = UIImage(named: testArray[indexPath.row].testPic!)
-        detailedVC.filmTitleLabel.text = testArray[indexPath.row].testTitle
-        detailedVC.ratingLabel.text = testArray[indexPath.row].testRating
-        detailedVC.releaseYearLabel.text = testArray[indexPath.row].testYear
-        
-        self.navigationController?.modalTransitionStyle = .partialCurl
-
-        navigationController?.pushViewController(detailedVC, animated: true)
         
     }
-    
-}
 
-extension MainViewController: UISearchBarDelegate{
-    
 }

@@ -1,14 +1,14 @@
 //
-//  FilmCollectionViewCell.swift
+//  FavoriteFilmsCollectionViewCell.swift
 //  FilmsApp
 //
-//  Created by Ruslan Ismailov on 08/02/23.
+//  Created by Ruslan Ismailov on 23/05/23.
 //
 
 import UIKit
 import CoreData
 
-class FilmCollectionViewCell: UICollectionViewCell {
+class FavoriteFilmsCollectionViewCell: UICollectionViewCell {
     
     let posterPreviewImageView: UIImageView = {
         let image = UIImageView()
@@ -69,7 +69,7 @@ class FilmCollectionViewCell: UICollectionViewCell {
         let image = UIImageView(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
         image.translatesAutoresizingMaskIntoConstraints = false
         image.image = UIImage(systemName: "heart.fill")
-        image.tintColor = .systemGray4
+        image.tintColor = .red
         image.isUserInteractionEnabled = true
         
         return image
@@ -89,6 +89,7 @@ class FilmCollectionViewCell: UICollectionViewCell {
                 model.getPoster(filmUrl) { image in
                     self.posterPreviewImageView.image = image
                 }
+                
             } else {return}
         }
     }
@@ -132,7 +133,6 @@ class FilmCollectionViewCell: UICollectionViewCell {
         ])
         
     }
-    
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")

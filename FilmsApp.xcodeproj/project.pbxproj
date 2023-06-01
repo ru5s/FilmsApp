@@ -23,6 +23,13 @@
 		B596EC0A2A1A71130019F9F5 /* CoreDataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B596EC092A1A71130019F9F5 /* CoreDataService.swift */; };
 		B596EC0D2A1A72E20019F9F5 /* FilmsAppDataBase.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = B596EC0B2A1A72E20019F9F5 /* FilmsAppDataBase.xcdatamodeld */; };
 		B596EC0F2A1B3A640019F9F5 /* Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = B596EC0E2A1B3A640019F9F5 /* Model.swift */; };
+		B5CCA1FF2A1C727E00B14363 /* FavoriteFilmsCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5CCA1FE2A1C727E00B14363 /* FavoriteFilmsCollectionViewCell.swift */; };
+		B5CCA2022A1F450B00B14363 /* RoundingTransition.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5CCA2012A1F450B00B14363 /* RoundingTransition.swift */; };
+		B5CCA2042A24751000B14363 /* PicketView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5CCA2032A24751000B14363 /* PicketView.swift */; };
+		B5CCA2072A249AD100B14363 /* MainSearchExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5CCA2062A249AD100B14363 /* MainSearchExtension.swift */; };
+		B5CCA2092A249AE800B14363 /* MainStackButtonsExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5CCA2082A249AE800B14363 /* MainStackButtonsExtension.swift */; };
+		B5CCA20B2A249AFC00B14363 /* MainCollectionViewExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5CCA20A2A249AFC00B14363 /* MainCollectionViewExtension.swift */; };
+		B5CCA20E2A260CD700B14363 /* MainPaginationExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5CCA20D2A260CD700B14363 /* MainPaginationExtension.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -44,6 +51,13 @@
 		B596EC092A1A71130019F9F5 /* CoreDataService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataService.swift; sourceTree = "<group>"; };
 		B596EC0C2A1A72E20019F9F5 /* FilmsAppDataBase.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = FilmsAppDataBase.xcdatamodel; sourceTree = "<group>"; };
 		B596EC0E2A1B3A640019F9F5 /* Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Model.swift; sourceTree = "<group>"; };
+		B5CCA1FE2A1C727E00B14363 /* FavoriteFilmsCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteFilmsCollectionViewCell.swift; sourceTree = "<group>"; };
+		B5CCA2012A1F450B00B14363 /* RoundingTransition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoundingTransition.swift; sourceTree = "<group>"; };
+		B5CCA2032A24751000B14363 /* PicketView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PicketView.swift; sourceTree = "<group>"; };
+		B5CCA2062A249AD100B14363 /* MainSearchExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainSearchExtension.swift; sourceTree = "<group>"; };
+		B5CCA2082A249AE800B14363 /* MainStackButtonsExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainStackButtonsExtension.swift; sourceTree = "<group>"; };
+		B5CCA20A2A249AFC00B14363 /* MainCollectionViewExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainCollectionViewExtension.swift; sourceTree = "<group>"; };
+		B5CCA20D2A260CD700B14363 /* MainPaginationExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainPaginationExtension.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -83,9 +97,7 @@
 				B5FFEEE429B47C8D00BE1A65 /* Launch and assets */,
 				B5FFEEE329B47C4100BE1A65 /* System */,
 				B566175F2991021900D24AC2 /* Info.plist */,
-				B566176D2991782900D24AC2 /* FavoriteFilmsViewController.swift */,
 				B56617692991780B00D24AC2 /* FilmPicsViewController.swift */,
-				B566176B2991781700D24AC2 /* FullPicViewController.swift */,
 				B596EC0B2A1A72E20019F9F5 /* FilmsAppDataBase.xcdatamodeld */,
 			);
 			path = FilmsApp;
@@ -96,8 +108,45 @@
 			children = (
 				B596EC072A1A655D0019F9F5 /* URLService.swift */,
 				B596EC092A1A71130019F9F5 /* CoreDataService.swift */,
+				B5CCA2012A1F450B00B14363 /* RoundingTransition.swift */,
 			);
 			path = Service;
+			sourceTree = "<group>";
+		};
+		B5CCA1FC2A1C722600B14363 /* Favorite films */ = {
+			isa = PBXGroup;
+			children = (
+				B5CCA1FD2A1C725300B14363 /* Components */,
+				B566176D2991782900D24AC2 /* FavoriteFilmsViewController.swift */,
+			);
+			path = "Favorite films";
+			sourceTree = "<group>";
+		};
+		B5CCA1FD2A1C725300B14363 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				B5CCA1FE2A1C727E00B14363 /* FavoriteFilmsCollectionViewCell.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		B5CCA2052A249AB200B14363 /* Extension */ = {
+			isa = PBXGroup;
+			children = (
+				B5CCA2062A249AD100B14363 /* MainSearchExtension.swift */,
+				B5CCA2082A249AE800B14363 /* MainStackButtonsExtension.swift */,
+				B5CCA20A2A249AFC00B14363 /* MainCollectionViewExtension.swift */,
+				B5CCA20D2A260CD700B14363 /* MainPaginationExtension.swift */,
+			);
+			path = Extension;
+			sourceTree = "<group>";
+		};
+		B5CCA20C2A24A6DB00B14363 /* Full pictures */ = {
+			isa = PBXGroup;
+			children = (
+				B566176B2991781700D24AC2 /* FullPicViewController.swift */,
+			);
+			path = "Full pictures";
 			sourceTree = "<group>";
 		};
 		B5FFEEE329B47C4100BE1A65 /* System */ = {
@@ -121,6 +170,8 @@
 		B5FFEEE529B47CBA00BE1A65 /* Pages */ = {
 			isa = PBXGroup;
 			children = (
+				B5CCA20C2A24A6DB00B14363 /* Full pictures */,
+				B5CCA1FC2A1C722600B14363 /* Favorite films */,
 				B5FFEEEA29B4806400BE1A65 /* Detailed film */,
 				B5FFEEE629B47CC400BE1A65 /* Main */,
 			);
@@ -130,6 +181,7 @@
 		B5FFEEE629B47CC400BE1A65 /* Main */ = {
 			isa = PBXGroup;
 			children = (
+				B5CCA2052A249AB200B14363 /* Extension */,
 				B5FFEEE729B47CED00BE1A65 /* Components */,
 				B5661765299177E500D24AC2 /* MainViewController.swift */,
 			);
@@ -157,6 +209,7 @@
 			isa = PBXGroup;
 			children = (
 				B56617552991021700D24AC2 /* ViewController.swift */,
+				B5CCA2032A24751000B14363 /* PicketView.swift */,
 			);
 			path = "Test and trash files";
 			sourceTree = "<group>";
@@ -243,6 +296,10 @@
 				B596EC0D2A1A72E20019F9F5 /* FilmsAppDataBase.xcdatamodeld in Sources */,
 				B566176A2991780B00D24AC2 /* FilmPicsViewController.swift in Sources */,
 				B566176E2991782900D24AC2 /* FavoriteFilmsViewController.swift in Sources */,
+				B5CCA20E2A260CD700B14363 /* MainPaginationExtension.swift in Sources */,
+				B5CCA2022A1F450B00B14363 /* RoundingTransition.swift in Sources */,
+				B5CCA1FF2A1C727E00B14363 /* FavoriteFilmsCollectionViewCell.swift in Sources */,
+				B5CCA2072A249AD100B14363 /* MainSearchExtension.swift in Sources */,
 				B56617522991021700D24AC2 /* AppDelegate.swift in Sources */,
 				B596EC0A2A1A71130019F9F5 /* CoreDataService.swift in Sources */,
 				B5661768299177FD00D24AC2 /* DetailFilmViewController.swift in Sources */,
@@ -251,6 +308,9 @@
 				B58E5308299397D2008E2FB5 /* FilmCollectionViewCell.swift in Sources */,
 				B56617542991021700D24AC2 /* SceneDelegate.swift in Sources */,
 				B5661766299177E500D24AC2 /* MainViewController.swift in Sources */,
+				B5CCA20B2A249AFC00B14363 /* MainCollectionViewExtension.swift in Sources */,
+				B5CCA2092A249AE800B14363 /* MainStackButtonsExtension.swift in Sources */,
+				B5CCA2042A24751000B14363 /* PicketView.swift in Sources */,
 				B596EC082A1A655D0019F9F5 /* URLService.swift in Sources */,
 				B566176C2991781700D24AC2 /* FullPicViewController.swift in Sources */,
 			);

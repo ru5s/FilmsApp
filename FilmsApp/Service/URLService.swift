@@ -10,9 +10,8 @@ import UIKit
 import CryptoKit
 
 //все возможные варинаты запроса в апи (в приложении используется только 3)
-enum RequestOptions: String {
+enum RequestOptions: String, CaseIterable {
     case allMovie = "popular"
-    case latest = "latest"
     case nowPlaying = "now_playing"
     case topRated = "top_rated"
     case upcoming = "upcoming"
@@ -31,11 +30,9 @@ class URLService {
     var imageCache = NSCache <NSString, UIImage>()
     
     //запрос к апи на получения списка фильмов со сбегающим булевым замыканием на окончание процесса
-    func dataRequest(page: Int = 1, requestOptions: RequestOptions = .allMovie, completition: @escaping (Error?, MovieList?) -> ()) {
+    func dataRequest(page: Int, requestOptions: RequestOptions, completition: @escaping (Error?, MovieList?) -> ()) {
         
-        var page = "&page=\(page)"
-        
-        requestOptions == .latest ? (page = "") : (page = "page=\(page)")
+        let page = "&page=\(page)"
         
         guard let apiUrl: URL = URL(string: "\(adress)3/movie/\(requestOptions.rawValue)?\(apiKey)&language=en-US&\(page)") else { return }
         
@@ -44,9 +41,11 @@ class URLService {
             guard let unwrData = data,
                   (response as? HTTPURLResponse)?.statusCode == 200,
                   error == nil else {
+                print("nil")
                 completition(error, nil)
                 return
             }
+            
             do {
                 
                 let json = try JSONDecoder().decode(MovieList.self, from: unwrData)
@@ -58,43 +57,29 @@ class URLService {
                 print("task error \(error)")
             }
             
-            
-//            print("++ data - \(unwrData.count)")
-//            let sha256 = SHA256.hash(data: unwrData)
-//            print("++ hashValue - \(sha256)")
-            
-//            DispatchQueue.main.async {
-//                //отправка данных в парсер с сохранением всего в базу данных и получение ответа при достижении результата
-//                self.parser.parseJSON(parseData: unwrData, parseError: error, type: requestOptions.rawValue, completition: { bool in
-//
-//                    //если результат пришел то отправить сигнал
-//                    if bool == true {
-//                        completition(true)
-//                    }
-//                })
-//            }
-            
-            
         }
         task.resume()
     }
     
     //метод получения скриншотов по id фильма
-    func getScreenshots(_ filmId: Int, completition: @escaping (Error?, Data?) -> Void) {
-        
+    func getScreenshots(_ filmId: Int, completition: @escaping (Error?, AllScreens?) -> Void) {
+        //общая часть url запроса
         let assetAdress: String = "https://api.themoviedb.org/3/movie/"
-        
+        //полный url с проверкой состояния
         guard let assetApiUrl: URL = URL(string: "\(assetAdress)\(filmId)/images?\(apiKey)") else {return}
-        
+        //создание задачи
         let task = session.dataTask(with: assetApiUrl) {data, response, error in
-            
+            //проверка данных с проверкой статус кода
             guard let unwrData = data,
                   (response as? HTTPURLResponse)?.statusCode == 200,
                   error == nil else {
                 completition(error, nil)
                 return
             }
-            completition(nil, unwrData)
+            
+            let json = try! JSONDecoder().decode(AllScreens.self, from: unwrData)
+            
+            completition(nil, json)
             //отправка данных в парсер для сохранения линков в конкретный фильм в базе данных
 //            self.parser.parseLinkToScreenshots(parseData: unwrData, parseError: error, id: filmId, completition: { error in
 //                if let error = error {
@@ -109,7 +94,11 @@ class URLService {
     }
     
     //метод скачивания и кэширования картинок
-    func getSetPoster(withUrl url: URL, comletition: @escaping (UIImage) -> Void) {
+    func getSetPoster(withUrl partOfUrl: String, comletition: @escaping (UIImage) -> Void) {
+        let imageAdress = "https://image.tmdb.org/t/p/w500/"
+        
+        let url = URL(string: imageAdress + partOfUrl)
+        guard let url = url else {return}
         //проверка есть ли картинка в кэшах по средствам отправки в него ключа в виде полного url картинки
         if let cachedImage = imageCache.object(forKey: url.absoluteString as NSString) {
             //если есть то отправить в сбегающее замыкание картинку

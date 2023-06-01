@@ -41,7 +41,6 @@ class Model {
         urlService.dataRequest(page: page, requestOptions: requestOption) { error, movieList in
             
             if error != nil {
-                print("second nil")
                 print("coreDataService.saveData error \(String(describing: error))")
                 completition(false)
             }
@@ -49,7 +48,6 @@ class Model {
             guard let movieList = movieList else {return}
             
             if error == nil {
-                print("second not nil")
                 self.coreDataService.saveData(objects: movieList, requestOtions: requestOption)
                 completition(true)
             }

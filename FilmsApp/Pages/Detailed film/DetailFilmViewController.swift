@@ -54,8 +54,6 @@ class DetailFilmViewController: UIViewController, UIViewControllerTransitioningD
         label.text = "Год выпуска"
         label.textAlignment = .left
         label.font = UIFont.systemFont(ofSize: 20, weight: .semibold)
-//        label.font = UIFont.italicSystemFont(ofSize: 20)
-//        label.textColor = .systemGray
         label.textColor = .white
         
         return label
@@ -93,15 +91,17 @@ class DetailFilmViewController: UIViewController, UIViewControllerTransitioningD
     let collectionViewImagesOfMovie: UICollectionView = {
         
         let layout = UICollectionViewFlowLayout()
-        layout.sectionInset = UIEdgeInsets(top: 0, left: 20, bottom: 0, right: 0)
         layout.scrollDirection = .horizontal
-        layout.itemSize = CGSize(width: 100, height: 100)
+        layout.minimumLineSpacing = 0
         
         let cv = UICollectionView(frame: .zero, collectionViewLayout: layout)
         cv.translatesAutoresizingMaskIntoConstraints = false
         cv.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "allImageOfMovie")
         cv.showsHorizontalScrollIndicator = false
         cv.backgroundColor = .systemBackground
+        cv.collectionViewLayout = layout
+        
+        cv.isPagingEnabled = true
         
         return cv
     }()
@@ -132,6 +132,16 @@ class DetailFilmViewController: UIViewController, UIViewControllerTransitioningD
         block.backgroundColor = .systemBackground.withAlphaComponent(0.7)
         
         return block
+    }()
+    
+    let heartImage: UIImageView = {
+        let image = UIImageView(frame: CGRect(x: 0, y: 0, width: 70, height: 70))
+        image.translatesAutoresizingMaskIntoConstraints = false
+        image.image = UIImage(systemName: "heart.fill")
+        image.tintColor = .systemGray4
+        image.isUserInteractionEnabled = true
+        
+        return image
     }()
     
     let model = Model()
@@ -165,9 +175,6 @@ class DetailFilmViewController: UIViewController, UIViewControllerTransitioningD
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
         
-//        navigationItem.title = curentFilm?.filmTitle ?? ""
-        
-//        navigationController?.navigationBar.prefersLargeTitles = true
         navigationController?.navigationBar.isTranslucent = true
         let barItem = UIBarButtonItem(title: "add to Like", style: .plain, target: self, action: #selector(openFilmPics))
         
@@ -187,9 +194,16 @@ class DetailFilmViewController: UIViewController, UIViewControllerTransitioningD
         posterPreviewImageView.isUserInteractionEnabled = true
         posterPreviewImageView.addGestureRecognizer(tap)
         
+        let likedTap = UITapGestureRecognizer()
+        likedTap.numberOfTapsRequired = 1
+        likedTap.addTarget(self, action: #selector(likedTapGesture))
+        heartImage.isUserInteractionEnabled = true
+        heartImage.addGestureRecognizer(likedTap)
+        
         blackRectangle.addSubview(filmTitleLabel)
         blackRectangle.addSubview(releaseYearLabel)
         blackRectangle.addSubview(ratingLabel)
+        blackRectangle.addSubview(heartImage)
         
         view.addSubview(scrollView)
         
@@ -204,6 +218,8 @@ class DetailFilmViewController: UIViewController, UIViewControllerTransitioningD
         scrollView.addSubview(descriptionTitleLabel)
         scrollView.addSubview(blockDescriptionTextView)
         
+        model.checkLike(id: Int(curentFilm?.id ?? 0)) ? (heartImage.tintColor = .red) : (heartImage.tintColor = .lightGray)
+        
         DispatchQueue.main.async {
             self.model.getScreenshots(id: Int(self.curentFilm?.id ?? 0)) {
                 self.collectionViewImagesOfMovie.reloadData()
@@ -211,6 +227,15 @@ class DetailFilmViewController: UIViewController, UIViewControllerTransitioningD
         }
         
         collectionViewImagesOfMovie.reloadData()
+    }
+    
+    @objc private func likedTapGesture() {
+        model.chooseFilm(id: Int(curentFilm?.id ?? 0))
+        
+        UIView.animate(withDuration: 0.4) {
+            self.model.checkLike(id: Int(self.curentFilm?.id ?? 0)) ? (self.heartImage.tintColor = .red) : (self.heartImage.tintColor = .lightGray)
+        }
+        
     }
     
     override func viewDidLayoutSubviews() {
@@ -230,11 +255,15 @@ class DetailFilmViewController: UIViewController, UIViewControllerTransitioningD
             topBlockWithGradient.bottomAnchor.constraint(equalTo: safeZone.topAnchor),
             filmTitleLabel.bottomAnchor.constraint(equalTo: releaseYearLabel.topAnchor, constant: -10),
             filmTitleLabel.leadingAnchor.constraint(equalTo: safeZone.leadingAnchor),
-            filmTitleLabel.trailingAnchor.constraint(equalTo: safeZone.trailingAnchor),
+            filmTitleLabel.trailingAnchor.constraint(equalTo: heartImage.leadingAnchor, constant: 5),
             releaseYearLabel.leadingAnchor.constraint(equalTo: safeZone.leadingAnchor),
             releaseYearLabel.bottomAnchor.constraint(equalTo: posterPreviewImageView.bottomAnchor, constant: -10),
             ratingLabel.trailingAnchor.constraint(equalTo: safeZone.trailingAnchor),
             ratingLabel.bottomAnchor.constraint(equalTo: blackRectangle.bottomAnchor, constant: -10),
+            heartImage.centerXAnchor.constraint(equalTo: ratingLabel.centerXAnchor),
+            heartImage.centerYAnchor.constraint(equalTo: filmTitleLabel.centerYAnchor),
+            heartImage.heightAnchor.constraint(equalToConstant: 30),
+            heartImage.widthAnchor.constraint(equalToConstant: 30),
             scrollView.topAnchor.constraint(equalTo: posterPreviewImageView.bottomAnchor),
             scrollView.widthAnchor.constraint(equalToConstant: view.bounds.width),
             scrollView.bottomAnchor.constraint(equalTo: safeZone.bottomAnchor),
@@ -243,7 +272,7 @@ class DetailFilmViewController: UIViewController, UIViewControllerTransitioningD
             collectionViewImagesOfMovie.topAnchor.constraint(equalTo: collectionTitleLabel.bottomAnchor, constant: 10),
             collectionViewImagesOfMovie.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             collectionViewImagesOfMovie.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            collectionViewImagesOfMovie.heightAnchor.constraint(equalToConstant: 100),
+            collectionViewImagesOfMovie.heightAnchor.constraint(equalToConstant: 130),
             descriptionTitleLabel.topAnchor.constraint(equalTo: collectionViewImagesOfMovie.bottomAnchor, constant: 10),
             descriptionTitleLabel.leadingAnchor.constraint(equalTo: safeZone.leadingAnchor),
             blockDescriptionTextView.topAnchor.constraint(equalTo: descriptionTitleLabel.bottomAnchor, constant: 10),
@@ -279,14 +308,23 @@ extension DetailFilmViewController: UICollectionViewDelegate, UICollectionViewDa
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "allImageOfMovie", for: indexPath)
-        cell.backgroundColor = .gray
+//        cell.backgroundColor = .gray
         cell.layer.cornerRadius = 5
         cell.clipsToBounds = true
         
-        let image: UIImageView = UIImageView(frame: CGRect(x: 0, y: 0, width: cell.bounds.width, height: cell.bounds.height))
+        let margin: CGFloat = (cell.bounds.width - (cell.bounds.width - 10)) / 2
+        
+        let image: UIImageView = UIImageView(frame: CGRect(x: margin, y: margin, width: cell.bounds.width - 10, height: cell.bounds.height - 10))
+        
+        image.clipsToBounds = true
+        image.layer.cornerRadius = 5
         image.contentMode = .scaleAspectFill
         
         cell.addSubview(image)
+        
+        image.centerYAnchor.constraint(equalTo: cell.centerYAnchor).isActive = true
+        image.centerXAnchor.constraint(equalTo: cell.centerXAnchor).isActive = true
+        
         model.getPoster(curentFilm?.backdrop_path?[indexPath.row] ?? "", completiton: { testimage in
             image.image = testimage
         })
@@ -326,4 +364,21 @@ extension DetailFilmViewController: UICollectionViewDelegate, UICollectionViewDa
         return transition
     }
     
+}
+
+extension DetailFilmViewController: UICollectionViewDelegateFlowLayout {
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        
+        let width = (collectionView.bounds.width / 3)
+        let height = width
+        return CGSize(width: width, height: height)
+        
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
+        
+        return UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 5)
+        
+    }
 }

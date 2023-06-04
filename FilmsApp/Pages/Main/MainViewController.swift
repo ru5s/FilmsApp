@@ -43,6 +43,8 @@ class MainViewController: UIViewController {
         cv.showsVerticalScrollIndicator = false
         cv.autoresizingMask = .flexibleHeight
         
+//        cv.isPagingEnabled = true
+        
         return cv
     }()
     

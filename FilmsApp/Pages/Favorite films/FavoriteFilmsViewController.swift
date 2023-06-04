@@ -72,6 +72,13 @@ class FavoriteFilmsViewController: UIViewController {
         ])
         
     }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        print("++ appear")
+        model.arrayFavoritesFilms = model.allFilms
+        model.favoritesFilms()
+        collectionView.reloadData()
+    }
 }
 
 extension FavoriteFilmsViewController: UICollectionViewDelegate, UICollectionViewDataSource {

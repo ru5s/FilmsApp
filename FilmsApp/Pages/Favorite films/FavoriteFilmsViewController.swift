@@ -46,7 +46,7 @@ class FavoriteFilmsViewController: UIViewController {
         
         navigationItem.title = "Favorite films"
 
-        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .pause, target: self, action: #selector(openDetailFilm))
+//        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .pause, target: self, action: #selector(openDetailFilm))
         
         DispatchQueue.main.async {
             self.collectionView.reloadData()

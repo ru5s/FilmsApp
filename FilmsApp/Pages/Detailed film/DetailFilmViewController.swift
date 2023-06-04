@@ -176,10 +176,9 @@ class DetailFilmViewController: UIViewController, UIViewControllerTransitioningD
         view.backgroundColor = .systemBackground
         
         navigationController?.navigationBar.isTranslucent = true
-        let barItem = UIBarButtonItem(title: "add to Like", style: .plain, target: self, action: #selector(openFilmPics))
         
-        
-        navigationItem.rightBarButtonItem = barItem
+//        let barItem = UIBarButtonItem(title: "add to Like", style: .plain, target: self, action: #selector(openFilmPics))
+//        navigationItem.rightBarButtonItem = barItem
         
         
         view.backgroundColor = .systemBackground

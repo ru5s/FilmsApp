@@ -59,6 +59,8 @@ class MainViewController: UIViewController {
     var openStackBool = false
     var expandBtnTitle: String = "Popular"
     
+    var canUpdateInBottomCollection: Bool = true
+    
     let model = Model()
 
     override func viewDidLoad() {

@@ -25,7 +25,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 //        homeVC.selectedIndex = 0
         let nav = UINavigationController(rootViewController: homeVC)
         nav.navigationBar.tintColor = UIColor(named: "navigatorColor")
-        nav.navigationBar.titleTextAttributes = [.foregroundColor: UIColor(named: "navigatorColor")]
+        nav.navigationBar.titleTextAttributes = [.foregroundColor: UIColor(named: "navigatorColor") as Any]
         
 //        nav.navigationBar.backgroundColor = .systemBackground.withAlphaComponent(0.5)
         nav.navigationBar.isTranslucent = true

@@ -97,7 +97,6 @@
 				B5FFEEE429B47C8D00BE1A65 /* Launch and assets */,
 				B5FFEEE329B47C4100BE1A65 /* System */,
 				B566175F2991021900D24AC2 /* Info.plist */,
-				B56617692991780B00D24AC2 /* FilmPicsViewController.swift */,
 				B596EC0B2A1A72E20019F9F5 /* FilmsAppDataBase.xcdatamodeld */,
 			);
 			path = FilmsApp;
@@ -149,6 +148,14 @@
 			path = "Full pictures";
 			sourceTree = "<group>";
 		};
+		B5F13CDF2A2F61F400AA0155 /* Film pics gallary */ = {
+			isa = PBXGroup;
+			children = (
+				B56617692991780B00D24AC2 /* FilmPicsViewController.swift */,
+			);
+			path = "Film pics gallary";
+			sourceTree = "<group>";
+		};
 		B5FFEEE329B47C4100BE1A65 /* System */ = {
 			isa = PBXGroup;
 			children = (
@@ -170,6 +177,7 @@
 		B5FFEEE529B47CBA00BE1A65 /* Pages */ = {
 			isa = PBXGroup;
 			children = (
+				B5F13CDF2A2F61F400AA0155 /* Film pics gallary */,
 				B5CCA20C2A24A6DB00B14363 /* Full pictures */,
 				B5CCA1FC2A1C722600B14363 /* Favorite films */,
 				B5FFEEEA29B4806400BE1A65 /* Detailed film */,

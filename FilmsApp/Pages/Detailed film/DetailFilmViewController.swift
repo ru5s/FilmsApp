@@ -144,6 +144,16 @@ class DetailFilmViewController: UIViewController, UIViewControllerTransitioningD
         return image
     }()
     
+    let galleryScreenshotsBtn: UIButton = {
+        let btn = UIButton()
+        btn.translatesAutoresizingMaskIntoConstraints = false
+    
+        btn.setImage(UIImage(systemName: "chevron.right")?.withTintColor(UIColor(named: "navigatorColor") ?? .black, renderingMode: .alwaysOriginal), for: .normal)
+        btn.backgroundColor = .systemBackground.withAlphaComponent(0.7)
+        
+        return btn
+    }()
+    
     let model = Model()
     var curentFilm: Films?
     
@@ -173,7 +183,6 @@ class DetailFilmViewController: UIViewController, UIViewControllerTransitioningD
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .systemBackground
         
         navigationController?.navigationBar.isTranslucent = true
         
@@ -217,6 +226,10 @@ class DetailFilmViewController: UIViewController, UIViewControllerTransitioningD
         scrollView.addSubview(descriptionTitleLabel)
         scrollView.addSubview(blockDescriptionTextView)
         
+        scrollView.addSubview(galleryScreenshotsBtn)
+        
+        galleryScreenshotsBtn.addTarget(self, action: #selector(gellary), for: .touchUpInside)
+        
         model.checkLike(id: Int(curentFilm?.id ?? 0)) ? (heartImage.tintColor = .red) : (heartImage.tintColor = .lightGray)
         
         DispatchQueue.main.async {
@@ -226,6 +239,15 @@ class DetailFilmViewController: UIViewController, UIViewControllerTransitioningD
         }
         
         collectionViewImagesOfMovie.reloadData()
+    }
+    
+    @objc private func gellary() {
+        let filmPicsVC = FilmPicsViewController()
+        filmPicsVC.curentFilm = curentFilm
+        filmPicsVC.indexFilm = 0
+        
+        navigationController?.modalPresentationStyle = .fullScreen
+        navigationController?.pushViewController(filmPicsVC, animated: true)
     }
     
     @objc private func likedTapGesture() {
@@ -273,6 +295,11 @@ class DetailFilmViewController: UIViewController, UIViewControllerTransitioningD
             collectionViewImagesOfMovie.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             collectionViewImagesOfMovie.heightAnchor.constraint(equalToConstant: 130),
             descriptionTitleLabel.topAnchor.constraint(equalTo: collectionViewImagesOfMovie.bottomAnchor, constant: 10),
+            galleryScreenshotsBtn.topAnchor.constraint(equalTo: collectionViewImagesOfMovie.topAnchor, constant: 4),
+            galleryScreenshotsBtn.bottomAnchor.constraint(equalTo: collectionViewImagesOfMovie.bottomAnchor, constant: -4),
+            galleryScreenshotsBtn.widthAnchor.constraint(equalToConstant: view.bounds.width / 15),
+            galleryScreenshotsBtn.trailingAnchor.constraint(equalTo: collectionViewImagesOfMovie.trailingAnchor),
+            galleryScreenshotsBtn.centerYAnchor.constraint(equalTo: collectionViewImagesOfMovie.centerYAnchor),
             descriptionTitleLabel.leadingAnchor.constraint(equalTo: safeZone.leadingAnchor),
             blockDescriptionTextView.topAnchor.constraint(equalTo: descriptionTitleLabel.bottomAnchor, constant: 10),
             blockDescriptionTextView.leadingAnchor.constraint(equalTo: safeZone.leadingAnchor),
@@ -332,16 +359,13 @@ extension DetailFilmViewController: UICollectionViewDelegate, UICollectionViewDa
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let fullPicVC = FullPicViewController()
+
+        let filmPicsVC = FilmPicsViewController()
+        filmPicsVC.curentFilm = curentFilm
+        filmPicsVC.indexFilm = indexPath.row
         
-        model.getPoster(curentFilm?.backdrop_path?[indexPath.row] ?? "", completiton: { testimage in
-            fullPicVC.fullimage.image = testimage
-        })
-        
-        fullPicVC.transitioningDelegate = self
-        fullPicVC.modalPresentationStyle = .custom
-        
-        present(fullPicVC, animated: true)
+        navigationController?.modalPresentationStyle = .fullScreen
+        navigationController?.pushViewController(filmPicsVC, animated: true)
     }
     
     //метод кастомной анимации при появлении

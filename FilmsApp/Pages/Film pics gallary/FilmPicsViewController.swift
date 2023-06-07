@@ -38,13 +38,19 @@ class FilmPicsViewController: UIViewController {
         return label
     }()
     
-    let buttonStackView = UIStackView()
+    let rightBtn: UIButton = {
+        let btn = UIButton()
+        btn.translatesAutoresizingMaskIntoConstraints = false
+        
+        return btn
+    }()
     
-    let expandButton = UIButton()
-    
-    var expanded = false
-    
-    var expandBtnTitle: String = "Popular"
+    let leftBtn: UIButton = {
+        let btn = UIButton()
+        btn.translatesAutoresizingMaskIntoConstraints = false
+        
+        return btn
+    }()
     
     let model = Model()
     
@@ -66,6 +72,12 @@ class FilmPicsViewController: UIViewController {
         
         view.addSubview(collectionView)
         view.addSubview(currentNumberImage)
+        view.addSubview(rightBtn)
+        view.addSubview(leftBtn)
+        
+        rightBtn.addTarget(self, action: #selector(rightBtnTapped), for: .touchUpInside)
+        
+        leftBtn.addTarget(self, action: #selector(leftBtnTapped), for: .touchUpInside)
         
         currentNumberImage.text = indexFilm == 0 ? "0 / \(curentFilm?.backdrop_path?.count ?? 0)" : "\((indexFilm ?? 0) + 1) / \(curentFilm?.backdrop_path?.count ?? 0)"
         
@@ -81,7 +93,15 @@ class FilmPicsViewController: UIViewController {
             collectionView.topAnchor.constraint(equalTo: safeZone.topAnchor),
             collectionView.bottomAnchor.constraint(equalTo: safeZone.bottomAnchor),
             currentNumberImage.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            currentNumberImage.bottomAnchor.constraint(equalTo: safeZone.bottomAnchor, constant: -20)
+            currentNumberImage.bottomAnchor.constraint(equalTo: safeZone.bottomAnchor, constant: -20),
+            rightBtn.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: 0),
+            rightBtn.topAnchor.constraint(equalTo: collectionView.topAnchor),
+            rightBtn.bottomAnchor.constraint(equalTo: collectionView.bottomAnchor),
+            rightBtn.widthAnchor.constraint(equalToConstant: view.bounds.width / 6),
+            leftBtn.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 0),
+            leftBtn.topAnchor.constraint(equalTo: collectionView.topAnchor),
+            leftBtn.bottomAnchor.constraint(equalTo: collectionView.bottomAnchor),
+            leftBtn.widthAnchor.constraint(equalToConstant: view.bounds.width / 6),
         ])
     }
     
@@ -93,7 +113,29 @@ class FilmPicsViewController: UIViewController {
             
             DispatchQueue.main.async {
                 self.collectionView.scrollToItem(at: indexPath, at: .centeredVertically, animated: false)
-
+                self.collectionView.reloadData()
+            }
+        }
+    }
+    
+    @objc private func rightBtnTapped() {
+        if indexFilm != (curentFilm?.backdrop_path?.count ?? 0) - 1 {
+            indexFilm = (indexFilm ?? 0) + 1
+            let indexPath = IndexPath(item: indexFilm ?? 0, section: 0)
+            DispatchQueue.main.async {
+                self.collectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: true)
+                self.collectionView.reloadData()
+            }
+        }
+    }
+    
+    @objc private func leftBtnTapped() {
+        if indexFilm != 0 {
+            indexFilm = (indexFilm ?? 0) - 1
+            let indexPath = IndexPath(item: indexFilm ?? 0, section: 0)
+            DispatchQueue.main.async {
+                self.collectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: true)
+                self.collectionView.reloadData()
             }
         }
     }
@@ -139,6 +181,7 @@ extension FilmPicsViewController: UIScrollViewDelegate {
             let centeredItemIndex = indexPath.item
             
             currentNumberImage.text = "\(centeredItemIndex + 1) / \(curentFilm?.backdrop_path?.count ?? 0)"
+            indexFilm = centeredItemIndex
         }
     }
     

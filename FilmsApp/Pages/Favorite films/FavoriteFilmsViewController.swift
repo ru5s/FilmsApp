@@ -110,25 +110,10 @@ extension FavoriteFilmsViewController: UICollectionViewDelegate, UICollectionVie
         model.favoritesFilms()
         collectionView.reloadData()
         
-//        let indexPath = IndexPath(item: id, section: 0)
-//        model.deleteLikedArrayByIndex(index: index)
-        
-//        collectionView.performBatchUpdates({
-//                collectionView.deleteItems(at: [indexPath])
-//            }, completion: nil)
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        
-//        collectionView.performBatchUpdates {
-//
-//            model.chooseFilm(id: model.arrayFavoritesFilms?[indexPath.row].value(forKey: "id") as! Int)
-//
-//            model.favoritesFilms()
-//
-//            collectionView.deleteItems(at: [indexPath])
-//        }
-        
+       
         let detailedVC = DetailFilmViewController()
         
         detailedVC.data = model.arrayFavoritesFilms?[indexPath.item]

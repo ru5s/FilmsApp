@@ -49,7 +49,7 @@ class MainViewController: UIViewController {
     }()
     
     var sortType: RequestOptions = .allMovie
-    var pagePopular: Int = UserDefaults.standard.integer(forKey: "Pop")
+    var pagePopular: Int = 1
     var pageTopRated: Int = 1
     var pageWatching: Int = 1
     var pageUpcoming: Int = 1
@@ -69,7 +69,7 @@ class MainViewController: UIViewController {
         
         checkDB()
         
-        model.fetchDataFromApi(page: pagePopular, requestOption: .allMovie) { bool in
+        model.fetchDataFromApi(page: pagePopular, requestOption: sortType) { bool in
             DispatchQueue.main.async {
                 if bool == true {
                     self.collectionView.reloadData()
@@ -169,6 +169,8 @@ class MainViewController: UIViewController {
     }
     
     override func viewWillAppear(_ animated: Bool) {
+        
+        
         collectionView.reloadData()
     }
     

@@ -11,15 +11,14 @@ extension MainViewController: UISearchBarDelegate{
     
     //работа со строкой поиска
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        canUpdateInBottomCollection = false
         
-        //приравнивание вспомогательного массива к массиву всех фильмов что есть в базе
         model.arrayHelper = model.allFilms
         
-        //запус метода поиска по введенному тексту
         model.searchFilm(query: searchText)
         
-        //если поисковая строка пустая то производить обратное приравнивание и сортировку
         if searchText.isEmpty {
+            canUpdateInBottomCollection = true
             model.arrayHelper = model.allFilms
             model.sortFilms(sortType)
         }
@@ -34,6 +33,8 @@ extension MainViewController: UISearchBarDelegate{
         model.arrayHelper = model.allFilms
         
         model.sortFilms(sortType)
+        
+        canUpdateInBottomCollection = true
         
         DispatchQueue.main.async {
             self.collectionView.reloadData()

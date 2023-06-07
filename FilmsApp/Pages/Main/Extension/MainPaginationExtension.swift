@@ -12,25 +12,27 @@ import UIKit
 extension MainViewController: UICollectionViewDelegateFlowLayout {
     
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-        let contentHeight = scrollView.contentSize.height
-        let scrollHeight = scrollView.bounds.height
-        let scrollOffset = scrollView.contentOffset.y
         
-        let result = scrollOffset + scrollHeight >= contentHeight
-        
-        if result {
-            switch sortType {
-            case .allMovie:
-                pagination(type: .allMovie, userDefaultsKey: "Popular")
-            case .nowPlaying:
-                pagination(type: .nowPlaying, userDefaultsKey: "NowPlaying")
-            case .topRated:
-                pagination(type: .topRated, userDefaultsKey: "TopRated")
-            case .upcoming:
-                pagination(type: .upcoming, userDefaultsKey: "Upcoming")
+        if canUpdateInBottomCollection {
+            let contentHeight = scrollView.contentSize.height
+            let scrollHeight = scrollView.bounds.height
+            let scrollOffset = scrollView.contentOffset.y
+            
+            let result = scrollOffset + scrollHeight >= contentHeight
+            
+            if result {
+                switch sortType {
+                case .allMovie:
+                    pagination(type: .allMovie, userDefaultsKey: "Popular")
+                case .nowPlaying:
+                    pagination(type: .nowPlaying, userDefaultsKey: "NowPlaying")
+                case .topRated:
+                    pagination(type: .topRated, userDefaultsKey: "TopRated")
+                case .upcoming:
+                    pagination(type: .upcoming, userDefaultsKey: "Upcoming")
+                }
             }
         }
-        
     }
     
     private func pagination(type: RequestOptions, userDefaultsKey: String) {

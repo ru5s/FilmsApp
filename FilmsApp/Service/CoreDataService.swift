@@ -232,7 +232,7 @@ class CoreDataService {
         
     }
     
-    func searchFilm(_ string: String) -> [NSManagedObject] {
+    func searchFilm(_ string: String) -> [NSManagedObject]? {
         
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {return []}
         
@@ -250,7 +250,7 @@ class CoreDataService {
         } catch let error as NSError {
             
             print("Could not fetch \(error), \(error.userInfo)")
-            return []
+            return nil
         }
         
     }
